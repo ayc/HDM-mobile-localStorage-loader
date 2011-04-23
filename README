@@ -1,0 +1,99 @@
+========================================================
+
+the point?
+
+no real point. I read this http://www.stevesouders.com/blog/2011/03/28/storager-case-study-bing-google/
+
+and I figured it may be a fun little excercise to try out!
+
+
+========================================================
+
+
+CAVEATS:
+completely untested at the moment.
+
+needs localStorage support - so old it no work on older browsers.
+
+will only work with local resources, i.e. urls on your domain
+that means hotlinking stuff will no work.
+(you know, I can prolly try something else to access non-local resources, but I'm lazy..
+.. and it's a version 0 thing. /trollface)
+
+
+primarily aimed for iphone safari and android browsers.
+
+
+
+
+========================================================
+
+HOW TO USE:
+
+	1) replace your local script tags from:
+		<script type="text/javascript" src="/path/to/file/javascript.js"></script> 
+		
+		to
+		
+	    <meta name="localstorage:javascript" content="/path/to/file/javascript.js#version0" />
+		
+	2) replace your local css link tags from:
+		<link rel="stylesheet" type="text/css" href="/path/to/file/stylesheet.css">
+		
+		to
+		
+		<meta name="localStorage:stylesheet" content="/path/to/file/stylesheet.css#version0" />
+
+	3) add the bootloader somewhere near the bottom of your page.
+	
+and that's pretty much it. Now you iphone safari will use localStorage to cache your js files
+
+========================================================
+ok so this is how it works:
+
+1) add a the localStorage loader script somewhere near the bottom of your html
+2) the script searches for tags like this (in your header):
+
+    <meta name="localstorage:javascript" content="/path/to/file/javascript.js#version0" />
+    <meta name="localStorage:stylesheet" content="/path/to/file/stylesheet.css#version0" />
+
+
+Upon finding these tags, it'll simply do a quickie lookup in localStorage and see if
+	1) it doesn't exist or
+	2) if it's out of date
+	
+If any of those apply, the script downloads them via the intarwebs, and loads it in your page,
+ and it also keeps a copy in your localStorage container
+
+If neither of those apply, the script says, "STOP ALL THE DOWNLOADIN!" and grabs the copy
+of the contents in the localStorage container.
+
+
+========================================================
+
+"why use fragments for versioning?"
+
+I honestly don't know. I didn't think using queries was a good idea.
+I also thought about using a completely custom tag like 
+
+<localscript version="" src="">
+
+there version would be a custom attr that I can check against.
+And I figured that may be easier for html coders to decipher, but I dunno.
+
+In the end, I figured fragments themselves are the least volatile part of a uri.
+
+========================================================
+
+"does this even work"
+
+well, yeah I guess. The only browsers I've tested it on so far was
+
+	FF4
+	Safari 5.0.5
+	Chrome
+	That version of Safari on the iphone.
+	
+I haven't tried it out on android yet but I will.
+
+Prolly not gonna work on that crappy blackberry storm, especially moreso when javascript is disabled.
