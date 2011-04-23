@@ -26,37 +26,20 @@
 
 
 (function () {
-    function hget() {
-        return document.getElementsByTagName("head")[0] || document.documentElement;
-    }
-    function tget(tagName) {
-        return document.getElementsByTagName(tagName);
-    }
-    function simpleget(url, callback) {
-        var req = new XMLHttpRequest();
-        req.open('GET', url, false);
-        req.send(null);
-        if (req.status === 200) {
-            try {
-                callback(req.responseText);
-            } catch (e) {
-                throw ("[simpleget] execute failed! " + e + "\n\n" + callback);
-            }
-        }
-    }
     function addcss(data) {
-        var styleNode = document.createElement("STYLE");
-        var head = hget();
-        styleNode.textContent = data;
-        head.appendChild(styleNode);
+		addnodes(data,"STYLE");
     }
     function addscript(data) {
-        var scriptNode = document.createElement("SCRIPT");
-        var head = hget();
-        scriptNode.textContent = data;
-        head.appendChild(scriptNode);
+		addnodes(data,"SCRIPT");
     }
-    function checkForKey(name, version) {
+	function addnodes(data,tag){
+        var styleNode = document.createElement(tag);
+        var head = document.getElementsByTagName("head")[0] || document.documentElement;
+        styleNode.textContent = data;
+        head.appendChild(styleNode);
+	}
+	
+    function cKey(name, version) {
         var myarrayofSimilarKeys = [];
         var exactKey = null;
         var lsLength = localStorage.length;
@@ -76,7 +59,7 @@
         }
         return exactKey;
     }
-    function graburi(type, callback) {
+    function guri(type, callback) {
         var tagsarray = document.getElementsByTagName("meta");
         var returnarray = [];
         var i;
@@ -88,18 +71,25 @@
                 var content = tagsarray[i].getAttribute("content").split("#");
                 var url = content[0];
                 var version = content[1];
-                var mykey = checkForKey(url, version);
+                var mykey = cKey(url, version);
                 if ( !! mykey) {
                     callback(localStorage.getItem(mykey));
                 } else {
-                    simpleget(url, function (data) {
-                        localStorage.setItem(url + "#" + version, data);
-                        callback(data);
-                    });
+					var req = new XMLHttpRequest();
+					req.open('GET', url, false);
+					req.send(null);
+					if (req.status === 200) {
+						try {
+							localStorage.setItem(url + "#" + version, data);
+							callback(req.responseText);
+						} catch (e) {
+							throw ("[simpleget] execute failed! " + e + "\n\n" + callback);
+						}
+					}
                 }
             }
         }
     }
-    graburi("javascript", addscript);
-    graburi("stylesheet", addcss);
+    guri("javascript", addscript);
+    guri("stylesheet", addcss);
 }());
